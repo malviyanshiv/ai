@@ -1,6 +1,6 @@
 # AI
 
-Programming implementation of the Basic AI algorithm
+Programming implementation of the Basic AI algorithms
 
 ## Getting Started
 
@@ -20,7 +20,7 @@ Additional files are present with the name file_name.* .
 
 ## Contents
 
-1. [Searching Techniques](https://github.com/malviyanshiv/ai/tree/master/ai-nptel-2018/searching_graph/README.md)
+1. [Search Algorithms](https://github.com/malviyanshiv/ai/tree/master/ai-nptel-2018/searching_graph/README.md)
 
 ## Contributing
 
