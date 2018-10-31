@@ -8,7 +8,7 @@ Each game info is given in their **README.md** file.
 
 ## Contents
 
-1. [N-Puzzle](https://github.com/malviyanshiv/ai/tree/master/toy_problems/tree/master/n_puzzle/README.md)
+1. [N-Puzzle](https://github.com/malviyanshiv/ai/blob/master/toy_problems/n_puzzle/README.md)
 
 ## Contributing
 
