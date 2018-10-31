@@ -7,22 +7,24 @@
 using namespace std;
 
 #define REP(i, s, e) for(int i = s; i < e; i++)
-#define NODES_COUNT 24
+
+bool ascii_mode = true;
+int nodes_count  = 24;
 
 // A list containing position of each node
-vector< pair<int, int> > Nodes(NODES_COUNT);
+vector< pair<int, int> > Nodes;
 // The adjacency matrix containing edges list
-int edges[NODES_COUNT][NODES_COUNT];
+vector< vector<int> > edges;
 // List for keeping the parent pointers
-vector<int> parent(NODES_COUNT, -1);
+vector<int> parent;
 // List for maintaining the known best path
-vector<int> dis(NODES_COUNT, 0), G(NODES_COUNT, 0);
+vector<int> dis, G;
 // List for checking the presence of node in list
 // 0 - new   1 - OPEN    2 - CLOSED
-vector<int> state(NODES_COUNT, 0);
+vector<int> state;
 
 void initialise(){
-    REP(i, 0, NODES_COUNT){
+    REP(i, 0, nodes_count){
         parent[i] = -1;
         dis[i] = 0;
         G[i] = 0;
@@ -30,14 +32,30 @@ void initialise(){
     }
 }
 
-void print_path(int n){
-    if( parent[n] == -1){
-        cout << (char)(n+'A') << " ";
-        return;
-    }
-    print_path(parent[n]);
-    cout << " --> " << (char)(n+'A');
+void reshape(){
+    Nodes.resize(nodes_count);
+    edges.resize(nodes_count, vector<int>(nodes_count));
+    parent.resize(nodes_count, -1);
+    dis.resize(nodes_count);
+    state.resize(nodes_count);
+    G.resize(nodes_count);
 }
+
+void print_path( int n ){
+    if( parent[n] == -1 ){
+        if( ascii_mode )
+            cout << " " << (char)(n+'A');
+        else
+            cout << " " << n+1;
+    }else{
+        print_path( parent[n] );
+        if( ascii_mode )
+            cout << " -> " << (char)(n+'A');
+        else
+            cout << " -> " << n+1;
+    }
+}
+
 
 int heuristic_manhattan(int first, int second){
     int result = abs(Nodes[first].first - Nodes[second].first) + abs(Nodes[first].second - Nodes[second].second);
@@ -63,7 +81,7 @@ public:
 
 vector<int> moveGen(int node){
     vector<int> neighbour;
-    REP(i, 0, NODES_COUNT)
+    REP(i, 0, nodes_count)
         if( edges[i][node] != 0 ) // is a neighbour
             neighbour.push_back(i);
     return neighbour;
@@ -93,7 +111,10 @@ bool a_star_manhattan(int start, int end){
         int node = v.back();
         v.pop_back();
         state[node] = 2;
-        cout << " Node : " << (char)(node+'A') << " f(n): " << setw(3) << dis[node] << " g(n): " << setw(3) << G[node] << " h(n): " << setw(3) << heuristic_manhattan(node, end) << endl;
+        if( ascii_mode )
+            cout << " Node : " << setw(3) << (char)(node+'A') << " f(n): " << setw(3) << dis[node] << " g(n): " << setw(3) << G[node] << " h(n): " << setw(3) << heuristic_manhattan(node, end) << endl;
+        else
+            cout << " Node : " << setw(3) << node+1 << " f(n): " << setw(3) << dis[node] << " g(n): " << setw(3) << G[node] << " h(n): " << setw(3) << heuristic_manhattan(node, end) << endl;
         if( node == end )
             return true;
         for(int c: moveGen(node)){
@@ -138,7 +159,10 @@ bool a_star_euclidean(int start, int end){
         int node = v.back();
         v.pop_back();
         state[node] = 2;
-        cout << " Node : " << (char)(node+'A') << " f(n): " << setw(3) << dis[node] << " g(n): " << setw(3) << G[node] << " h(n): " << setw(3) << heuristic_eucledian(node, end) << endl;
+        if( ascii_mode )
+            cout << " Node : " << setw(3) << (char)(node+'A') << " f(n): " << setw(3) << dis[node] << " g(n): " << setw(3) << G[node] << " h(n): " << setw(3) << heuristic_manhattan(node, end) << endl;
+        else
+            cout << " Node : " <<  setw(3) << node+1 << " f(n): " << setw(3) << dis[node] << " g(n): " << setw(3) << G[node] << " h(n): " << setw(3) << heuristic_manhattan(node, end) << endl;
         if( node == end )
             return true;
         for(int c: moveGen(node)){
@@ -172,35 +196,61 @@ bool a_star_euclidean(int start, int end){
 }
 
 int main(){
-    char start, end;
+    char startc='a', endc='a';
+    int starti=0, endi=0;
     int edge_count;
     int x, y, w;
+    char mode='1';
 
     // Initialising edges matrix
-    REP(i, 0, NODES_COUNT)
-        REP(j, 0, NODES_COUNT)
+    cin >> mode;
+    if(mode == 'A')
+        ascii_mode = true;
+    else
+        ascii_mode = false;
+    cin >> nodes_count;
+    reshape();
+    REP(i, 0, nodes_count)
+        REP(j, 0, nodes_count)
             edges[i][j] = 0;
 
     // Input position of every node assuming order
-    REP(i, 0, NODES_COUNT)
+    REP(i, 0, nodes_count)
         cin >> Nodes[i].first >> Nodes[i].second;
 
-    // Input edges count then each edge configuration
+        // Input edges count then each edge configuration
     cin >> edge_count;
     REP(i, 0, edge_count){
-        cin >> start >> end >> w;
-        // Mapping character with integer
-        x = start - 'A'; y = end - 'A';
+        if( ascii_mode )
+            cin >> startc >> endc >> w;
+        else
+            cin >> starti >> endi >> w;
+        if( ascii_mode ){
+            x = startc - 'A';
+            y = endc - 'A';
+        }else{
+            x = starti-1;
+            y = endi-1;
+        }
         edges[x][y] = w;
         edges[y][x] = w;
     }
-
     // Inputing source and destination
-    cin >> start >> end;
-    x = start - 'A';
-    y = end - 'A';
-
-    cout << "Source : " << start << " , Destination: " << end <<endl;
+    if( ascii_mode )
+        cin >> startc >> endc;
+    else
+        cin >> starti >> endi;
+    if( ascii_mode ){
+        x = startc - 'A';
+        y = endc - 'A';
+    }else{
+        x = starti-1;
+        y = endi-1;
+    }
+    if( ascii_mode )
+        cout << "Source: " << char(startc) << "  Destination: " << char(endc) << endl;
+    else
+        cout << "Source: " << starti << "  Destination: " << endi << endl;
 
     cout << "Using Manhattan Distance as heuristic function:" << endl;
     cout << "Oder of processing nodes: " << endl;
@@ -210,10 +260,14 @@ int main(){
         cout << endl;
 
         cout << "G(n) for all nodes:";
-        REP(i, 0, NODES_COUNT){
+        REP(i, 0, nodes_count){
             if(i%3 == 0)
                 cout << endl;
-            cout << (char)(i+'A') << " -> " << setw(3) << (state[i] != 0 ? to_string(G[i]): "no") <<"   ";
+            if( ascii_mode )
+                cout << (char)(i+'A') << " -> " << setw(3) << (state[i] != 0 ? to_string(G[i]): "no") <<"   ";
+            else
+                cout << i+1 << " -> " << setw(3) << (state[i] != 0 ? to_string(G[i]): "no") <<"   ";
+
         }
         cout << endl;
     }else{
@@ -229,10 +283,13 @@ int main(){
         cout << endl;
 
         cout << "G(n) for all nodes:";
-        REP(i, 0, NODES_COUNT){
+        REP(i, 0, nodes_count){
             if(i%3 == 0)
                 cout << endl;
-            cout << (char)(i+'A') << " -> " << setw(3) << (state[i] != 0 ? to_string(G[i]): "no") <<"   ";
+            if( ascii_mode )
+                cout << (char)(i+'A') << " -> " << setw(3) << (state[i] != 0 ? to_string(G[i]): "no") <<"   ";
+            else
+                cout << i+1 << " -> " << setw(3) << (state[i] != 0 ? to_string(G[i]): "no") <<"   ";
         }
         cout << endl;
     }else{

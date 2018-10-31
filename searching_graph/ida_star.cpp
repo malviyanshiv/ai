@@ -7,20 +7,29 @@
 using namespace std;
 
 #define REP(i, s, e) for(int i = s; i < e; i++)
-#define NODES_COUNT 24
 #define H heuristic_manhattan
 #define INF 1000000007
 #define all(v) v.begin(), v.end()
 
+bool ascii_mode = true;
+int nodes_count  = 24;
+
 // A list containing position of each node
-vector< pair<int, int> > Nodes(NODES_COUNT);
+vector< pair<int, int> > Nodes;
 // The adjacency matrix containing edges list
-int edges[NODES_COUNT][NODES_COUNT];
+vector< vector<int> > edges;
 // List for maintaining the known best path
-vector<int> dis(NODES_COUNT, 0);
+vector<int> dis;
 // List for checking the presence of node in list
 // 0 - new   1 - OPEN    2 - CLOSED
-vector<int> state(NODES_COUNT, 0);
+vector<int> state;
+
+void reshape(){
+    Nodes.resize(nodes_count);
+    edges.resize(nodes_count, vector<int>(nodes_count));
+    dis.resize(nodes_count);
+    state.resize(nodes_count);
+}
 
 bool is_visited(vector<int> &path, int node){
 	for(int c: path)
@@ -33,9 +42,15 @@ void print_path(vector<int> &path, int bound){
 	cout << "Path is found with bound : " << bound << endl;
 	REP(i, 0, path.size()){
 		if( i == path.size()-1)
-			cout << (char)(path[i]+'A');
+			if( ascii_mode )
+				cout << (char)(path[i]+'A');
+			else
+				cout << path[i]+1 ;
 		else
-			cout << (char)(path[i]+'A') << " --> ";
+			if( ascii_mode )
+				cout << (char)(path[i]+'A') << " --> ";
+			else
+				cout << path[i]+1 << " --> ";
 	}
 }
 
@@ -54,7 +69,7 @@ public:
 
 vector<int> moveGen(int node, int g, int goal){
     vector<int> neighbour;
-    REP(i, 0, NODES_COUNT)
+    REP(i, 0, nodes_count)
         if( edges[i][node] != 0 ){ // is a neighbour
             neighbour.push_back(i);
             dis[i] = g + H(i, goal);
@@ -67,7 +82,10 @@ int search(vector<int> &path, int g, int bound, int goal){
 	int f = g + H(node, goal);
 	if ( f > bound )
 		return f;
-	cout << (char)(node+'A') << "  g(" << (char)(node+'A') << "): " << setw(4) << g << "  f(" << (char)(node+'A') << "): " << setw(4)<< f << " bound: " << setw(4) << bound << endl;
+	if( ascii_mode )
+		cout << (char)(node+'A') << "  g(" << (char)(node+'A') << "): " << setw(4) << g << "  f(" << (char)(node+'A') << "): " << setw(4)<< f << " bound: " << setw(4) << bound << endl;
+	else
+		cout << setw(4) << node+1 << "  g(" << setw(4) << node+1 << "): " << setw(4) << g << "  f(" << setw(4) << node+1 << "): " << setw(4)<< f << " bound: " << setw(4) << bound << endl;
 	if ( node == goal )
 		return 0;
 	int mini = INF;
@@ -105,35 +123,62 @@ bool ida_star(int root, int goal){
 }
 
 int main(){
-    char start, goal;
+    char startc='a', endc='a';
+    int starti=0, endi=0;
     int edge_count;
     int x, y, w;
+    char mode='1';
 
     // Initialising edges matrix
-    REP(i, 0, NODES_COUNT)
-        REP(j, 0, NODES_COUNT)
+    cin >> mode;
+    if(mode == 'A')
+        ascii_mode = true;
+    else
+        ascii_mode = false;
+    cin >> nodes_count;
+    reshape();
+    REP(i, 0, nodes_count)
+        REP(j, 0, nodes_count)
             edges[i][j] = 0;
 
     // Input position of every node assuming order
-    REP(i, 0, NODES_COUNT)
+    REP(i, 0, nodes_count)
         cin >> Nodes[i].first >> Nodes[i].second;
 
-    // Input edges count then each edge configuration
+        // Input edges count then each edge configuration
     cin >> edge_count;
     REP(i, 0, edge_count){
-        cin >> start >> goal >> w;
-        // Mapping character with integer
-        x = start - 'A'; y = goal - 'A';
+        if( ascii_mode )
+            cin >> startc >> endc >> w;
+        else
+            cin >> starti >> endi >> w;
+        if( ascii_mode ){
+            x = startc - 'A';
+            y = endc - 'A';
+        }else{
+            x = starti-1;
+            y = endi-1;
+        }
         edges[x][y] = w;
         edges[y][x] = w;
     }
-
     // Inputing source and destination
-    cin >> start >> goal;
-    x = start - 'A';
-    y = goal - 'A';
+    if( ascii_mode )
+        cin >> startc >> endc;
+    else
+        cin >> starti >> endi;
+    if( ascii_mode ){
+        x = startc - 'A';
+        y = endc - 'A';
+    }else{
+        x = starti-1;
+        y = endi-1;
+    }
+    if( ascii_mode )
+        cout << "Source: " << char(startc) << "  Destination: " << char(endc) << endl;
+    else
+        cout << "Source: " << starti << "  Destination: " << endi << endl;
 
-    cout << "Source : " << start << " , Destination: " << goal <<endl;
     if( ! ida_star(x, y)){
     	cout << "No path found to the goal node!!!\n";
     }
