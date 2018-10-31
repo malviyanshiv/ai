@@ -4,23 +4,20 @@ Programming implementation of the Basic AI algorithms
 
 ## Getting Started
 
-This include implementation of algorithms in C++ divided in different sections. Each section contains **README.md** file listing different algorithm implemented and their explanation (sudo code) for easy understanding of the code for beginners.
+This include implementation of algorithms in C++ and python divided in different sections. Each section contains **README.md** file listing different algorithm implemented and their explanation (sudo code) for easy understanding of the code for beginners.
 
 ## Prerequisites
 
-Knowledge of C++ along with basic info about the algorithm make your way easier.
+Knowledge of C++ and python along with basic info about the algorithm make your way easier.
 
 ## Running the tests
 
-```
-$ g++ file_name.cpp -o file_name
-$ file_name < file_name.txt
-```
-Additional files are present with the name file_name.* .
+Each folder is having **readme.txt** which contains the description about running those files and dependency required. 
 
 ## Contents
 
-1. [Search Algorithms](https://github.com/malviyanshiv/ai/tree/master/ai-nptel-2018/searching_graph/README.md)
+1. [Search Algorithms](https://github.com/malviyanshiv/ai/tree/master/searching_graph/README.md)
+2. [Toy Problems](https://github.com/malviyanshiv/ai/tree/master/toy_problems/README.md)
 
 ## Contributing
 
